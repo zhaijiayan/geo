@@ -1,0 +1,70 @@
+package com.lenovo.quotation.web.rest;
+
+import com.lenovo.quotation.annotation.Authorized;
+import com.lenovo.quotation.annotation.AuthorizedScope;
+import com.lenovo.quotation.aop.Permission;
+import com.lenovo.quotation.common.QuotationUser;
+import com.lenovo.quotation.common.client.UserClient;
+import com.lenovo.quotation.common.profile.Basic;
+import com.lenovo.quotation.common.utility.Collections;
+import com.lenovo.quotation.common.utility.UserInfoUtil;
+import com.lenovo.quotation.service.AdjustmentGridHeaderService;
+import com.lenovo.quotation.service.BaseGridHeaderService;
+import com.lenovo.quotation.service.GeographicUnitSettingService;
+import com.lenovo.quotation.util.PermissionUtil;
+import com.lenovo.quotation.web.rest.constant.MustBuyContentEnum;
+import com.lenovo.quotation.web.rest.dto.pager.PageInfo;
+import com.lenovo.quotation.web.rest.dto.pager.PageInfoResponse;
+import com.lenovo.quotation.web.rest.dto.request.AdjustmentGridHeaderRequestDTO;
+import com.lenovo.quotation.web.rest.dto.request.AdjustmentGridHeaderSearchDTO;
+import com.lenovo.quotation.web.rest.dto.request.BusinessUnitEnum;
+import com.lenovo.quotation.web.rest.dto.response.AdjustmentGridHeaderResponseDTO;
+import com.lenovo.quotation.web.rest.errors.BadRequestAlertException;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
+
+@Authorized(scopes={@AuthorizedScope(scope=Permission.ADJUST_GRID)})
+@Slf4j
+@RestController
+@RequestMapping("/geo")
+public class GeoResource {
+
+
+    @PostMapping("/search")
+    public String create() {
+
+        String apiKey = "c0235dec9b223b7aa843802bef942b74";
+        String address = "北京市朝阳区望京街";
+        //String url = "https://restapi.amap.com/v3/geocode/geo?address=" + address + "&key=" + apiKey;
+        //String url = "https://restapi.amap.com/v3/direction/walking?origin=116.434307,39.90909&destination=116.434446,39.90816&key="+ apiKey;
+
+        //String url = "https://restapi.amap.com/v3/place/text?keywords=北京大学&city=beijing&offset=20&page=1&key="+ apiKey;
+        String url = "https://restapi.amap.com/v3/place/text?keywords=美食&city=beijing&offset=20&page=1&key="+ apiKey;
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpGet request = new HttpGet(url);
+            String response = EntityUtils.toString(httpClient.execute(request).getEntity());
+            System.out.println("响应结果：" + response);
+            return response;
+        } catch (ClientProtocolException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+}
